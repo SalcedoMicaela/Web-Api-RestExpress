@@ -1,0 +1,46 @@
+{
+    "products": [
+        {
+            "id": 1,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "10.00",
+            "payment_status": "Pendiente",
+            "notification_sent": 0
+        },
+        {
+            "id": 2,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "58.50",
+            "payment_status": "Pagado",
+            "notification_sent": 0
+        },
+        {
+            "id": 4,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "7.00",
+            "payment_status": "Pendiente",
+            "notification_sent": 0
+        },
+        {
+            "id": 5,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "8.00",
+            "payment_status": "Pendiente",
+            "notification_sent": 0
+        },
+        {
+            "id": 6,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "8.00",
+            "payment_status": "Pendiente",
+            "notification_sent": 0
+        },
+        {
+            "id": 7,
+            "issue_date": "2025-01-23T00:00:00.000Z",
+            "total_amount": "8.00",
+            "payment_status": "Pendiente",
+            "notification_sent": 0
+        }
+    ]
+}
