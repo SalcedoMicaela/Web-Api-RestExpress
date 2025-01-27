@@ -1,0 +1,31 @@
+GET http://localhost:3000/products HTTP/1.1
+
+###
+//GET http://localhost:3000/products/3 HTTP/1.1
+PUT http://localhost:3000/products/1 HTTP/1.1
+Content-Type: application/json
+
+{
+    "total_amount": "10.00"
+}
+//DELETE http://localhost:3000/products/3 HTTP/1.1
+//Content-Type: application/json
+###
+
+POST http://localhost:3000/products
+Content-Type: application/json
+
+
+
+{
+    "serial_number": "GK123462",
+    "brand": "ADIDAS",
+    "model": "ProMax 9000",
+    "size": "9",
+    "color": "Yellow/Black",
+    "is_new": true,
+    "price": "75.00"
+}
+
+
+###
