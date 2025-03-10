@@ -1,4 +1,4 @@
-GET http://localhost:3000/products HTTP/1.1
+GET http://localhost:3000/check-discounts HTTP/1.1
 
 ###
 //GET http://localhost:3000/products/3 HTTP/1.1
@@ -18,8 +18,8 @@ Content-Type: application/json
 
 
 {
-    "serial_number": "GK123462",
-    "brand": "ADIDAS",
+    "serial_number": "Gh555",
+    "brand": "NIKESS",
     "model": "ProMax 9000",
     "size": "9",
     "color": "Yellow/Black",

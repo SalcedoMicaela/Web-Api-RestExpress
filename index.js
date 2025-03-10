@@ -2,10 +2,14 @@ import express from "express";
 import bodyParser from "body-parser";
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
+import cors from "cors";  // Importamos cors
 
-dotenv.config(); // Carga las variables de entorno desde el archivo .env
-
+dotenv.config(); 
 const app = express();
+
+// Habilitar CORS para todas las rutas
+app.use(cors());  // Esto permitirá solicitudes desde cualquier origen
+
 app.use(bodyParser.json());
 
 // Configuración del pool de conexiones
@@ -60,44 +64,69 @@ app.get("/products/:id", async (req, res) => {
 });
 
 // Crear un nuevo producto
-app.post("/products", async (req, res) => {
+// Crear un nuevo producto
+app.post('/gloves', async (req, res) => {
     const { serial_number, brand, model, size, color, is_new, price } = req.body;
-
-    if (!serial_number || !brand || !model || !size || !color || is_new === undefined || !price) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios" });
-    }
+    const checkQuery = 'SELECT * FROM Goalkeeper_gloves WHERE serial_number = ?';
 
     try {
-        const query = `
-            INSERT INTO Goalkeeper_gloves (serial_number, brand, model, size, color, is_new, price)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-        const [result] = await pool.query(query, [
-            serial_number,
-            brand,
-            model,
-            size,
-            color,
-            is_new,
-            price,
-        ]);
+        const [results] = await pool.query(checkQuery, [serial_number]);
+        if (results.length > 0) {
+            return res.status(400).json({ error: 'El número de serie ya está registrado' });
+        }
 
-        res.status(201).json({
-            message: "Producto insertado exitosamente",
-            product: {
-                id: result.insertId,
-                serial_number,
-                brand,
-                model,
-                size,
-                color,
-                is_new,
-                price,
-            },
+        // Calcular precio con descuento si NO es nuevo
+        let finalPrice = price;
+        if (is_new == 0) { 
+            if (price > 150) {
+                finalPrice = price * 0.8; // 20% de descuento
+            } else if (price >= 100 && price <= 150) {
+                finalPrice = price * 0.85; // 15% de descuento
+            } else {
+                finalPrice = price * 0.9; // 10% de descuento
+            }
+        }
+
+        const insertQuery = 'INSERT INTO Goalkeeper_gloves (serial_number, brand, model, size, color, is_new, price) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const [result] = await pool.query(insertQuery, [serial_number, brand, model, size, color, is_new, finalPrice]);
+
+        res.status(201).json({ message: 'Guantes registrados exitosamente', finalPrice });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al guardar los datos' });
+    }
+});
+
+// Verificar descuentos aplicados a los guantes
+app.get('/check-discounts', async (req, res) => {
+    const query = 'SELECT serial_number, price AS original_price, price * ? AS final_price, is_new FROM Goalkeeper_gloves';
+
+    try {
+        // Aquí, "1" es el multiplicador (sin descuento) por defecto
+        const [results] = await pool.query(query, [1]);
+
+        const updatedGloves = results.map(glove => {
+            let finalPrice = glove.original_price;
+
+            // Aplicar descuento si no es nuevo
+            if (glove.is_new === 0) {  // Si no es nuevo
+                if (glove.original_price > 150) {
+                    finalPrice = glove.original_price * 0.8;  // 20% descuento
+                } else if (glove.original_price >= 100 && glove.original_price <= 150) {
+                    finalPrice = glove.original_price * 0.85;  // 15% descuento
+                } else {
+                    finalPrice = glove.original_price * 0.9;  // 10% descuento
+                }
+            }
+
+            glove.final_price = finalPrice;
+            return glove;
         });
-    } catch (error) {
-        console.error("Error al insertar el producto:", error);
-        res.status(500).json({ message: "Error al insertar el producto", error });
+
+        res.status(200).json(updatedGloves);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error al obtener los datos' });
     }
 });
 
@@ -166,5 +195,25 @@ app.listen(PORT, () => {
 
 
 
+app.post('/products', async (req, res) => {
+    const { serial_number, brand, model, size, color, is_new, price } = req.body;
+
+    if (!serial_number || !brand || !model || !size || !color || is_new === undefined || !price) {
+        return res.status(400).json({ error: "Todos los campos son obligatorios" });
+    }
+
+    try {
+        const query = `
+            INSERT INTO Goalkeeper_gloves (serial_number, brand, model, size, color, is_new, price) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+        await pool.query(query, [serial_number, brand, model, size, color, is_new, price]);
+
+        res.status(201).json({ message: "Producto agregado correctamente" });
+    } catch (error) {
+        console.error("Error en el POST:", error);
+        res.status(500).json({ error: "Error al agregar el producto" });
+    }
+});
 
 
