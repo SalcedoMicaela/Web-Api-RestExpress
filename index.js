@@ -97,6 +97,37 @@ app.post('/gloves', async (req, res) => {
     }
 });
 
+
+app.get('/toys/total/:id_client', async (req, res) => {
+    const { id_client } = req.params;
+    
+    const sumQuery = `SELECT id_client, name_client, SUM(number_toys) AS total_toys 
+                      FROM clients 
+                      WHERE id_client = ? 
+                      GROUP BY id_client, name_client`;
+
+    try {
+        const [results] = await pool.query(sumQuery, [id_client]);
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Client no found' });
+        }
+
+        const { name_client, total_toys } = results[0];
+
+        res.json({ message: `${name_client} with ID ${id_client} buy ${total_toys} toys` });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error ' });
+    }
+});
+
+
+
+
+
+
+
 // Verificar descuentos aplicados a los guantes
 app.get('/check-discounts', async (req, res) => {
     const query = 'SELECT serial_number, price AS original_price, price * ? AS final_price, is_new FROM Goalkeeper_gloves';

@@ -1,7 +1,7 @@
 GET http://localhost:3000/check-discounts HTTP/1.1
 
 ###
-//GET http://localhost:3000/products/3 HTTP/1.1
+GET http://localhost:3000/toys/total/10 HTTP/1.1
 PUT http://localhost:3000/products/1 HTTP/1.1
 Content-Type: application/json
 
